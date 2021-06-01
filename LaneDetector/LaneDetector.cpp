@@ -1,32 +1,8 @@
-/** MIT License
-Copyright (c) 2017 Miguel Maestre Trueba
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- *@copyright Copyright 2017 Miguel Maestre Trueba
- *@file LaneDetector.cpp
- *@author Miguel Maestre Trueba
- *@brief Definition of all the function that form part of the LaneDetector class.
- *@brief The class will take RGB images as inputs and will output the same RGB image but
- *@brief with the plot of the detected lanes and the turn prediction.
- */
+
 #include <string>
 #include <vector>
 #include "opencv2/opencv.hpp"
 #include "../include/LaneDetector.hpp"
-
 // IMAGE BLURRING
 /**
  *@brief Apply gaussian filter to the input image to denoise it
@@ -201,7 +177,7 @@ std::vector<cv::Point> LaneDetector::regression(std::vector<std::vector<cv::Vec4
 
     if (right_pts.size() > 0) {
       // The right line is formed here
-      cv::fitLine(right_pts, right_line, CV_DIST_L2, 0, 0.01, 0.01);
+      cv::fitLine(right_pts, right_line, cv::DIST_L2, 0, 0.01, 0.01);
       right_m = right_line[1] / right_line[0];
       right_b = cv::Point(right_line[2], right_line[3]);
     }
@@ -219,7 +195,7 @@ std::vector<cv::Point> LaneDetector::regression(std::vector<std::vector<cv::Vec4
 
     if (left_pts.size() > 0) {
       // The left line is formed here
-      cv::fitLine(left_pts, left_line, CV_DIST_L2, 0, 0.01, 0.01);
+      cv::fitLine(left_pts, left_line, cv::DIST_L2, 0, 0.01, 0.01);
       left_m = left_line[1] / left_line[0];
       left_b = cv::Point(left_line[2], left_line[3]);
     }
@@ -286,18 +262,18 @@ int LaneDetector::plotLane(cv::Mat inputImage, std::vector<cv::Point> lane, std:
   poly_points.push_back(lane[0]);
   poly_points.push_back(lane[1]);
   poly_points.push_back(lane[3]);
-  cv::fillConvexPoly(output, poly_points, cv::Scalar(0, 0, 255), CV_AA, 0);
+  cv::fillConvexPoly(output, poly_points, cv::Scalar(0, 0, 255), cv::LINE_AA, 0);
   cv::addWeighted(output, 0.3, inputImage, 1.0 - 0.3, 0, inputImage);
 
   // Plot both lines of the lane boundary
-  cv::line(inputImage, lane[0], lane[1], cv::Scalar(0, 255, 255), 5, CV_AA);
-  cv::line(inputImage, lane[2], lane[3], cv::Scalar(0, 255, 255), 5, CV_AA);
+  cv::line(inputImage, lane[0], lane[1], cv::Scalar(0, 255, 255), 5, cv::LINE_AA);
+  cv::line(inputImage, lane[2], lane[3], cv::Scalar(0, 255, 255), 5, cv::LINE_AA);
 
   // Plot the turn message
-  cv::putText(inputImage, turn, cv::Point(50, 90), cv::FONT_HERSHEY_COMPLEX_SMALL, 3, cvScalar(0, 255, 0), 1, CV_AA);
+  cv::putText(inputImage, turn, cv::Point(50, 90), cv::FONT_HERSHEY_COMPLEX_SMALL, 3, cv::Scalar(0, 255, 0), 1, cv::LINE_AA);
 
   // Show the final output image
-  cv::namedWindow("Lane", CV_WINDOW_AUTOSIZE);
+  cv::namedWindow("Lane", cv::WINDOW_AUTOSIZE);
   cv::imshow("Lane", inputImage);
   return 0;
 }
